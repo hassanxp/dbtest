@@ -6,6 +6,29 @@ from sqlalchemy.orm import sessionmaker, relation, backref
 Base = declarative_base()
 
 
+# From Yabe-san's core schema
+class pfi_visit(Base):
+    __tablename__ = 'pfi_visit'
+
+    pfi_visit_id = Column(Integer, primary_key=True, unique=True, autoincrement=False)
+    pfi_visit_description = Column(String)
+
+    def __init__(self, pfi_visit_id, pfi_visit_description):
+        self.pfi_visit_id = pfi_visit_id
+        self.pfi_visit_description = pfi_visit_description
+
+
+class pfs_site(Base):
+    __tablename__ = 'pfs_site'
+
+    site_id = Column(Integer, primary_key=True, unique=True, autoincrement=False)
+    site_description = Column(String)
+
+    def __init__(self, site_id, site_description):
+        self.site_id = site_id
+        self.site_description = site_description
+
+
 class visit_set(Base):
     __tablename__ = 'visit_set'
 
@@ -20,12 +43,12 @@ class visit_set(Base):
 class visit_info(Base):
     __tablename__ = 'visit_info'
 
-    visit = Column(Integer, primary_key=True, autoincrement=False)
+    visit_id = Column(Integer, ForeignKey('pfi_visit.pfi_visit_id'), primary_key=True)
     set_id = Column(Integer, ForeignKey('visit_set.set_id'))
     visit_type = Column(String)
 
-    def __init__(self, set_id, visit, visit_type):
-        self.visit = visit
+    def __init__(self, set_id, visit_id, visit_type):
+        self.visit_id = visit_id
         self.set_id = set_id
         self.visit_type = visit_type
 
@@ -35,7 +58,7 @@ class sps_annotation(Base):
 
     annotation_id = Column(Integer, primary_key=True, autoincrement=False)
     set_id = Column(Integer, ForeignKey('visit_set.set_id'))
-    visit = Column(Integer, ForeignKey('visit_info.visit'))
+    visit = Column(Integer, ForeignKey('pfi_visit.pfi_visit_id'))
     comment = Column(String)
     anomaly = Column(String)
 
@@ -66,16 +89,16 @@ class sps_anomalies(Base):
     __tablename__ = 'sps_anomalies'
 
     anomaly_id = Column(Integer, primary_key=True, autoincrement=False)
-    visit = Column(Integer, ForeignKey('visit_info.visit'), unique=True)
-    site = Column(String)  # Foreign key to which table?
+    visit_id = Column(Integer, ForeignKey('pfi_visit.pfi_visit_id'))
+    site_id = Column(Integer, ForeignKey('pfs_site.site_id')) 
     sps_module = Column(Integer)
     arm = Column(String)
     description = Column(String)
 
-    def __init__(self, anomaly_id, visit, site, sps_module, arm, description):
+    def __init__(self, anomaly_id, visit_id, site_id, sps_module, arm, description):
         self.anomaly_id = anomaly_id
-        self.visit = visit
-        self.site = site
+        self.visit = visit_id
+        self.site_id = site_id
         self.sps_module = sps_module
         self.arm = arm
         self.description = description
@@ -86,7 +109,7 @@ class processing_status(Base):
 
     status_id = Column(Integer, primary_key=True, autoincrement=False)
     set_id = Column(Integer, ForeignKey('visit_set.set_id'), unique=True)
-    visit = Column(Integer, ForeignKey('visit_info.visit'), unique=True)
+    visit = Column(Integer, ForeignKey('pfi_visit.pfi_visit_id'))
     data_ok = Column(String)
 
     def __init__(self, status_id, set_id, visit, data_ok):
