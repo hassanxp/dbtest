@@ -110,7 +110,7 @@ class processing_status(Base):
     status_id = Column(Integer, primary_key=True, autoincrement=False)
     set_id = Column(Integer, ForeignKey('visit_set.set_id'), unique=True)
     visit = Column(Integer, ForeignKey('pfi_visit.pfi_visit_id'))
-    data_ok = Column(String)
+    data_ok = Column(Boolean)
 
     def __init__(self, status_id, set_id, visit, data_ok):
         self.status_id = status_id
@@ -125,18 +125,18 @@ def make_database(dbinfo):
     '''
     # engine = create_engine('sqlite:///:memory:', echo=True)
     # engine = create_engine('sqlite:///pfs_proto.sqlite', echo=False)
-    engine=create_engine(dbinfo)
+    engine = create_engine(dbinfo)
 
     Base.metadata.drop_all(engine)
 
     Base.metadata.create_all(engine)
 
-    Session=sessionmaker(bind = engine)
+    Session = sessionmaker(bind=engine)
     Session()
 
 
 if __name__ == '__main__':
     import sys
-    dbinfo=sys.argv[1]
+    dbinfo = sys.argv[1]
     print(dbinfo)
     make_database(dbinfo)
