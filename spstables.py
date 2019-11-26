@@ -61,7 +61,6 @@ Base = declarative_base()
 class visit_set(Base):
     __tablename__ = 'visit_set'
    
-
     visit_set_id = Column(Integer, primary_key=True, autoincrement=False, comment='visit set identifier')
     name = Column(String, comment='The unique name assigned to this set of visits')
     cmd_str = Column(String, comment='ICS command string that generates exposures for this set of visits')
